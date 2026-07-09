@@ -1,6 +1,6 @@
 ---
 name: chord-copilot
-description: "Answer data questions against the Chord warehouse using the chord MCP retrieval and execution tools. Use when the user asks about warehouse data, schema, metrics, revenue, customers, orders, products, subscriptions, sessions, attribution, Shopify, Klaviyo, Iterable, or any saved/canonical query — i.e. anything that would be answered by SQL against the Chord data model. Triggers include 'how many', 'show me', 'top N', 'last month', 'last quarter', 'trend', 'breakdown', 'compare', 'revenue', 'orders', 'customers'. Walks the agent through the default retrieval-grounded SQL workflow: search_schema → search_saved_views / search_sql_pairs → search_instructions → draft SQL → execute_sql. Requires the chord-copilot MCP server to be connected; if the mcp__chord__* tools are not available, fall back to the user's normal workflow and tell them to connect the server."
+description: "Answer data questions against the Chord warehouse using the chord MCP retrieval and execution tools. Use when the user asks about warehouse data, schema, metrics, revenue, customers, orders, products, subscriptions, sessions, attribution, Shopify, Klaviyo, Iterable, or any saved/canonical query — i.e. anything that would be answered by SQL against the Chord data model. Triggers include 'how many', 'show me', 'top N', 'last month', 'last quarter', 'trend', 'breakdown', 'compare', 'revenue', 'orders', 'customers'. Also exposes two purpose-built insight tools — get_channel_performance (paid-channel ROAS/CAC with Chord multi-touch attribution) and get_audience_insights (repeat rate, LTV, RFM, activatable audiences) — prefer these for marketing-performance and audience questions (ROAS, CAC, 'which channel', 'shift budget', 'who should I target', 'winback', 'lookalike', 'repeat rate', 'churn'). Walks the agent through the default retrieval-grounded SQL workflow: search_schema → search_saved_views / search_sql_pairs → search_instructions → draft SQL → execute_sql. Requires the chord-copilot MCP server to be connected; if the mcp__chord__* tools are not available, fall back to the user's normal workflow and tell them to connect the server."
 ---
 
 # Chord Copilot — data-question workflow
@@ -29,6 +29,12 @@ table names when these tools are available.
 - **`execute_sql`** — run a read-only query (SELECT/UNION/INTERSECT/EXCEPT
   only; capped at 10000 rows). Pass `validate_only=True` to parse-check
   without executing.
+- **`get_channel_performance`** — paid-channel ROAS/CAC with Chord's
+  multi-touch attribution (see the marketing-insights section below). Prefer
+  it over hand-written SQL for channel/spend/ROAS/CAC questions.
+- **`get_audience_insights`** — customer-base health + activatable audiences
+  (repeat rate, LTV, RFM, winback, lookalike seed). Prefer it over hand-written
+  SQL for audience/segment/retention questions.
 - **`list_tenants`** — list the tenants (Chord organizations) you have access
   to. Returns `[{name, slug, current}]` where `current` marks the tenant your
   requests route to right now. Every other tool automatically targets the
@@ -61,6 +67,34 @@ For a data question:
    queries) to return rows.
 
 Run independent retrieval steps in parallel.
+
+## Actionable marketing insights (prefer these over hand-written SQL)
+
+For paid-media performance or audience questions, reach for these purpose-built
+tools instead of the search_* → execute_sql workflow — they already encode the
+attribution joins, coverage caveats, and RFM/predictive enrichment.
+
+- **`get_channel_performance`** — per channel: Chord-attributed ROAS *and* the
+  platform's self-reported ROAS, CAC, period-over-period deltas, best/worst
+  summary. Params: `window_days` (default 30; use a shorter window for tenants
+  whose attribution was instrumented recently) and `attribution_model`
+  (linear | last_touch | first_touch | forty_twenty_forty). **Trust `chord_roas`
+  only when a channel's `coverage` is `full`** — `low_attribution_sample`,
+  `spend_without_attribution`, or `attributed_without_mapped_spend` mean judge
+  that channel on `platform_roas` instead. Lead with the platform-vs-Chord ROAS
+  gap — the insight no ad platform can show. Use for "what's my real ROAS/CAC
+  by channel", "which channel should I shift budget to/from".
+- **`get_audience_insights`** — customer-base health (repeat rate, one-time
+  share, realized LTV, subscribers) + ranked activatable audiences (recent
+  one-time buyers, high-value lookalike seed, discount-acquired win-back, and —
+  when the tenant has the DataScience RFM/CLR model — Champions and At-Risk
+  Valuable, with total predicted book value), plus the brand's existing Klaviyo
+  segments. Check `feature_coverage` for which predictive/RFM signals were
+  available; prefer activating an existing segment over recreating one. Use for
+  "who should I target/suppress", "what's my repeat rate", "find a
+  winback/lookalike audience".
+
+Cite the `coverage` / `feature_coverage` caveats so the numbers are read right.
 
 ## How to present the answer
 
