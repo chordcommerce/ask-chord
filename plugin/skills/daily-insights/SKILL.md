@@ -64,63 +64,47 @@ Set the two comparison periods:
 
 ## Signal 2 — Channel ROAS comparison (ACQUISITION)
 
-**Query via `execute_sql`** (use `search_saved_views("roas by channel")` first):
+**Call `get_channel_performance`** (`window_days: 90` for a quarter, or `30` if
+`comparison_period = month`; `attribution_model: 'linear'`). This is the
+grounded, attribution-aware source — do NOT hand-write channel ROAS SQL. It
+returns per-channel `chord_roas`, `platform_roas`, `cac`, deltas, `coverage`,
+and a `summary` naming the best/worst paid channel.
 
-```sql
-WITH spend AS (
-    SELECT
-        channel,
-        SUM(spend) AS total_spend
-    FROM fct_marketing_spend
-    WHERE spend_date >= DATE_TRUNC('quarter', CURRENT_DATE())
-    GROUP BY channel
-),
-revenue AS (
-    SELECT
-        acquisition_channel AS channel,
-        SUM(o.net_total) AS attributed_revenue
-    FROM fct_orders o
-    JOIN dim_customers c ON o.customer_id = c.customer_id
-    WHERE o.order_date >= DATE_TRUNC('quarter', CURRENT_DATE())
-      AND o.status = 'completed'
-      AND o.is_first_order = TRUE
-    GROUP BY acquisition_channel
-)
-SELECT
-    s.channel,
-    s.total_spend,
-    r.attributed_revenue,
-    ROUND(r.attributed_revenue / NULLIF(s.total_spend, 0), 2) AS roas
-FROM spend s
-LEFT JOIN revenue r ON s.channel = r.channel
-WHERE s.total_spend > 0
-ORDER BY roas DESC
-```
+Read it correctly:
+- Rank on `chord_roas` only for channels with `coverage = 'full'`. For
+  `low_attribution_sample`, `spend_without_attribution`, or
+  `attributed_without_mapped_spend`, judge on `platform_roas` and note that
+  attribution coverage is too thin to conclude.
 
 **Flagging threshold:** Flag as WATCH if:
-- The gap between the highest and lowest ROAS channel exceeds
-  `roas_gap_threshold` (default 0.20x), indicating reallocation opportunity
-- OR any channel ROAS is below 1.0x (spend exceeds attributed revenue)
+- Among `full`-coverage channels, `summary.best_chord_roas` − `summary.worst_chord_roas`
+  exceeds `roas_gap_threshold` (default 0.20x), indicating reallocation opportunity
+- OR any `full`-coverage channel's `chord_roas` is below 1.0x
 
 **Metrics to capture:**
-- Top two channels by ROAS and their values
-- Weakest channel name and ROAS
+- Best/worst paid channel and their Chord ROAS (from `summary`)
+- The platform-vs-Chord ROAS gap for the top spender
+- Any channel flagged `low_attribution_sample` (call it out, don't score it)
 
 ---
 
 ## Signal 3 — Repeat rate & LTV (RETENTION)
 
-**Query via `ask`:**
-> "What is the repeat purchase rate and average customer lifetime value for
-> the current quarter versus the prior quarter?"
+**Call `get_audience_insights`.** Read `customer_base.repeat_rate_pct` and
+`customer_base.avg_realized_ltv` for the current values, and the
+`opportunities` (recent one-time buyers, at-risk valuable, etc.) for the
+actionable follow-up. This is the grounded source — don't hand-write repeat/LTV
+SQL. (The tool reports a current snapshot; if a QoQ delta is required, pull the
+prior-period repeat rate with a separate `ask`.)
 
 **Flagging threshold:** Flag as WATCH if:
-- Repeat rate < `repeat_rate_floor` (default 60%)
-- OR repeat rate declined more than 2pp QoQ
-- OR avg LTV declined QoQ
+- `repeat_rate_pct` < `repeat_rate_floor` (default 60%)
+- OR (if a prior-period value was fetched) repeat rate declined > 2pp QoQ
+- OR avg realized LTV declined QoQ
 
 **Metrics to capture:**
-- `repeat_rate_current`, `avg_ltv_current`
+- `repeat_rate_pct`, `avg_realized_ltv`
+- Size of the top retention opportunity (e.g. recent one-time buyers to win back)
 
 ---
 
