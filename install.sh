@@ -31,7 +31,7 @@ set -euo pipefail
 
 SKILL_NAME="ask-chord"
 REPO_PATH="chordcommerce/ask-chord"
-SKILL_REPO_PATH="plugin/skills/ask-chord/SKILL.md"
+SKILL_REPO_PATH="plugins/chord/skills/ask-chord/SKILL.md"
 DEFAULT_MCP_URL="https://mcp.chord.co/mcp"
 
 CLIENT="claude-code"
