@@ -291,6 +291,21 @@ the `mcp-remote` shim shown above.
   lives at `~/.claude/skills/ask-chord/SKILL.md` and restart the
   Claude Code session.
 
+## Developing this repo
+
+The marketplace manifest (`.claude-plugin/marketplace.json`) and each
+plugin manifest (`plugins/*/.claude-plugin/plugin.json`) are validated in
+CI on every pull request. To check them locally before pushing:
+
+```bash
+./scripts/validate.sh
+```
+
+It runs `claude plugin validate --strict` against the marketplace and
+every plugin (discovered from `plugins/*/`), and exits non-zero if any
+manifest is invalid. Requires the Claude Code CLI
+(`npm install -g @anthropic-ai/claude-code`).
+
 ## License
 
 MIT. See [LICENSE](LICENSE).

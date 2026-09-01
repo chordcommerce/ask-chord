@@ -1,0 +1,37 @@
+name: Validate plugins
+
+# Fail the build if the marketplace manifest or any plugin manifest is
+# invalid, so a bad edit can't merge and break installs for users.
+on:
+  pull_request:
+    paths:
+      - ".claude-plugin/**"
+      - "plugins/**"
+      - "scripts/validate.sh"
+      - ".github/workflows/validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - ".claude-plugin/**"
+      - "plugins/**"
+      - "scripts/validate.sh"
+      - ".github/workflows/validate.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    env:
+      # Keep the CLI from making non-essential network calls in CI.
+      CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Validate marketplace and plugin manifests
+        run: ./scripts/validate.sh
