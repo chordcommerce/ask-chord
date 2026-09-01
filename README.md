@@ -58,7 +58,7 @@ You need to do two things: **register the MCP server** so Claude Code
 can talk to Ask Chord, and **install the skill** so Claude knows the
 retrieval-grounded workflow for using it.
 
-## Install via the Chord marketplace (recommended)
+### Install via the Chord marketplace (recommended)
 
 Chord's plugins live in a public Claude Code marketplace. Add it once,
 then install the plugins you want:
