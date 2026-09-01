@@ -1,16 +1,39 @@
 {
   "name": "chord",
-  "owner": { "name": "Chord Commerce" },
-  "description": "Chord Commerce's Claude Code plugin marketplace.",
+  "owner": { "name": "Chord Commerce", "url": "https://chord.co" },
+  "description": "Chord Commerce's Claude Code plugin marketplace — connect Claude to your Chord warehouse and run analytics workflows.",
   "plugins": [
     {
       "name": "chord",
-      "source": {
-        "source": "git-subdir",
-        "url": "https://github.com/chordcommerce/ask-chord.git",
-        "path": "plugin"
-      },
-      "description": "Registers the Ask Chord MCP server and installs the data-question workflow skill."
+      "source": "./plugins/chord",
+      "displayName": "Chord",
+      "description": "Registers the Ask Chord MCP server and the data-question workflow skill.",
+      "category": "data",
+      "keywords": ["chord", "warehouse", "analytics", "sql", "mcp"]
+    },
+    {
+      "name": "chord-activation-health",
+      "source": "./plugins/chord-activation-health",
+      "displayName": "Chord Activation Health",
+      "description": "Report the health of all audience syncs and destinations.",
+      "category": "data",
+      "keywords": ["chord", "activation", "sync", "klaviyo", "meta"]
+    },
+    {
+      "name": "chord-metric-verify",
+      "source": "./plugins/chord-metric-verify",
+      "displayName": "Chord Metric Verify",
+      "description": "Verify a revenue/order/LTV figure uses the correct basis before it ships.",
+      "category": "data",
+      "keywords": ["chord", "verify", "revenue", "metrics"]
+    },
+    {
+      "name": "chord-daily-insights",
+      "source": "./plugins/chord-daily-insights",
+      "displayName": "Chord Daily Insights",
+      "description": "Nightly commerce-signals digest posted to Slack.",
+      "category": "data",
+      "keywords": ["chord", "insights", "digest", "slack", "cron"]
     }
   ]
 }
