@@ -1,0 +1,8 @@
+{
+  "name": "chord-activation-health",
+  "version": "0.2.0",
+  "description": "Report the health of all audience syncs and destinations against your Chord warehouse.",
+  "author": { "name": "Chord Commerce" },
+  "homepage": "https://github.com/chordcommerce/ask-chord",
+  "dependencies": ["chord"]
+}
