@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Install the chord-copilot Claude Code skill, or register the
-# chord-copilot MCP server in Claude Desktop's config.
+# Install the ask-chord Claude Code skill, or register the
+# ask-chord MCP server in Claude Desktop's config.
 #
 # Usage:
 #   ./install.sh [--client claude-code|claude-desktop] \
@@ -8,12 +8,12 @@
 #                [--url <url>] [--force]
 #
 # --client claude-code (default): drops SKILL.md at
-# ~/.claude/skills/chord-copilot/ (scope=user) or
-# <project>/.claude/skills/chord-copilot/ (scope=project). Does NOT
+# ~/.claude/skills/ask-chord/ (scope=user) or
+# <project>/.claude/skills/ask-chord/ (scope=project). Does NOT
 # register the MCP server — run `claude mcp add` separately, or use the
 # /plugin install path for one-step setup.
 #
-# --client claude-desktop: merges the chord-copilot MCP server entry
+# --client claude-desktop: merges the ask-chord MCP server entry
 # into ~/Library/Application Support/Claude/claude_desktop_config.json
 # (macOS) or ~/.config/Claude/claude_desktop_config.json (Linux) using
 # the mcp-remote stdio shim. Requires jq. macOS/Linux only.
@@ -23,15 +23,15 @@
 #
 # Public one-liners:
 #   # Claude Code skill:
-#   curl -fsSL https://raw.githubusercontent.com/chordcommerce/chord-copilot/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/chordcommerce/ask-chord/main/install.sh | bash
 #   # Claude Desktop MCP registration:
-#   curl -fsSL https://raw.githubusercontent.com/chordcommerce/chord-copilot/main/install.sh | bash -s -- --client claude-desktop
+#   curl -fsSL https://raw.githubusercontent.com/chordcommerce/ask-chord/main/install.sh | bash -s -- --client claude-desktop
 
 set -euo pipefail
 
-SKILL_NAME="chord-copilot"
-REPO_PATH="chordcommerce/chord-copilot"
-SKILL_REPO_PATH="plugin/skills/copilot/SKILL.md"
+SKILL_NAME="ask-chord"
+REPO_PATH="chordcommerce/ask-chord"
+SKILL_REPO_PATH="plugin/skills/ask-chord/SKILL.md"
 DEFAULT_MCP_URL="https://mcp.chord.co/mcp"
 
 CLIENT="claude-code"
@@ -151,8 +151,10 @@ if [[ "$CLIENT" == "claude-desktop" ]]; then
 
   TMP_CONFIG="$(mktemp -t chord-desktop.XXXXXX)"
   trap 'rm -f "$TMP_CONFIG"' EXIT
+  # Also drop the pre-rename "chord-copilot" entry so the server isn't
+  # registered twice after the Ask Chord rename.
   jq --arg name "$SKILL_NAME" --argjson entry "$DESIRED_ENTRY" \
-    '.mcpServers[$name] = $entry' "$CONFIG" > "$TMP_CONFIG"
+    '.mcpServers[$name] = $entry | del(.mcpServers["chord-copilot"])' "$CONFIG" > "$TMP_CONFIG"
   mv "$TMP_CONFIG" "$CONFIG"
 
   echo "registered $SKILL_NAME in: $CONFIG"
@@ -223,3 +225,10 @@ mkdir -p "$TARGET_DIR"
 cp "$SOURCE" "$TARGET"
 echo "installed $SKILL_NAME ($SCOPE scope): $TARGET"
 echo "  source: $SOURCE_DESC"
+
+# Remove the pre-rename skill dir so the two copies don't both trigger.
+LEGACY_DIR="$TARGET_ROOT/chord-copilot"
+if [[ -d "$LEGACY_DIR" ]]; then
+  rm -rf "$LEGACY_DIR"
+  echo "removed legacy skill dir: $LEGACY_DIR"
+fi

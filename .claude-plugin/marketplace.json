@@ -7,10 +7,10 @@
       "name": "chord",
       "source": {
         "source": "git-subdir",
-        "url": "https://github.com/chordcommerce/chord-copilot.git",
+        "url": "https://github.com/chordcommerce/ask-chord.git",
         "path": "plugin"
       },
-      "description": "Registers the Ask Chord MCP server (chord-copilot) and installs the data-question workflow skill."
+      "description": "Registers the Ask Chord MCP server and installs the data-question workflow skill."
     }
   ]
 }

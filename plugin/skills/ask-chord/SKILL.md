@@ -1,12 +1,12 @@
 ---
-name: chord-copilot
-description: "Answer data questions against the Chord warehouse using the chord MCP retrieval and execution tools. Use when the user asks about warehouse data, schema, metrics, revenue, customers, orders, products, subscriptions, sessions, attribution, Shopify, Klaviyo, Iterable, or any saved/canonical query — i.e. anything that would be answered by SQL against the Chord data model. Triggers include 'how many', 'show me', 'top N', 'last month', 'last quarter', 'trend', 'breakdown', 'compare', 'revenue', 'orders', 'customers'. Walks the agent through the default retrieval-grounded SQL workflow: search_schema → search_saved_views / search_sql_pairs → search_instructions → draft SQL → execute_sql. Requires the Ask Chord MCP server (registered as chord-copilot) to be connected; if the mcp__chord__* tools are not available, fall back to the user's normal workflow and tell them to connect the server."
+name: ask-chord
+description: "Answer data questions against the Chord warehouse using the chord MCP retrieval and execution tools. Use when the user asks about warehouse data, schema, metrics, revenue, customers, orders, products, subscriptions, sessions, attribution, Shopify, Klaviyo, Iterable, or any saved/canonical query — i.e. anything that would be answered by SQL against the Chord data model. Triggers include 'how many', 'show me', 'top N', 'last month', 'last quarter', 'trend', 'breakdown', 'compare', 'revenue', 'orders', 'customers'. Walks the agent through the default retrieval-grounded SQL workflow: search_schema → search_saved_views / search_sql_pairs → search_instructions → draft SQL → execute_sql. Requires the Ask Chord MCP server (registered as ask-chord) to be connected; if the mcp__chord__* tools are not available, fall back to the user's normal workflow and tell them to connect the server."
 ---
 
 # Ask Chord — data-question workflow
 
 You have access to a set of `mcp__chord__*` tools exposed by the Ask Chord
-MCP server (registered as `chord-copilot`). Reach for them automatically — without being asked — whenever the
+MCP server (registered as `ask-chord`). Reach for them automatically — without being asked — whenever the
 user's request involves the project's warehouse data, schema, saved queries,
 or product documentation. Do not fall back to hand-written SQL or guess at
 table names when these tools are available.
