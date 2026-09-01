@@ -17,6 +17,16 @@ infrastructure.
 > `ask-chord` (`claude mcp remove chord-copilot`, then the
 > `claude mcp add` command below).
 
+> **Upgrading from the bundled `chord` plugin?** `chord` is now lean —
+> it registers the MCP server and the core `ask-chord` skill only. The
+> activation-health, metric-verify, and daily-insights skills are now
+> separate plugins. Install any you use:
+> `/plugin install chord-activation-health@chord`,
+> `/plugin install chord-metric-verify@chord`,
+> `/plugin install chord-daily-insights@chord`. If you rely on the
+> nightly digest, install `chord-daily-insights` (it pulls `chord` and
+> `chord-metric-verify` automatically) and keep your Slack MCP connected.
+
 ## Before you start
 
 Ask Chord is reachable at a single global endpoint:
@@ -48,6 +58,59 @@ You need to do two things: **register the MCP server** so Claude Code
 can talk to Ask Chord, and **install the skill** so Claude knows the
 retrieval-grounded workflow for using it.
 
+## Install via the Chord marketplace (recommended)
+
+Chord's plugins live in a public Claude Code marketplace. Add it once,
+then install the plugins you want:
+
+```bash
+# Add the marketplace (one time)
+/plugin marketplace add chordcommerce/ask-chord
+
+# Base plugin: registers the Ask Chord MCP server + the data-question skill
+/plugin install chord@chord
+```
+
+Optional add-on plugins (each pulls in `chord` automatically):
+
+| Plugin | What it adds |
+|---|---|
+| `chord-activation-health@chord` | Audience-sync / destination health reporting |
+| `chord-metric-verify@chord` | Revenue/order/LTV figure verification |
+| `chord-daily-insights@chord` | Nightly commerce-signals digest to Slack (also pulls `chord-metric-verify`) |
+
+```bash
+/plugin install chord-daily-insights@chord   # installs chord + chord-metric-verify too
+```
+
+`chord-daily-insights` also needs a Slack MCP server connected in your
+own environment to post the digest.
+
+### Keeping plugins up to date
+
+Chord's marketplace entries are **version-unpinned**, so Claude Code
+tracks the latest commit — every change we ship to `main` becomes an
+available update. To pick updates up automatically, enable auto-update.
+
+**For a team (recommended):** commit this to your repo's
+`.claude/settings.json`. It auto-adds the marketplace and turns on
+background refresh + plugin auto-update for everyone who trusts the repo:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "chord": {
+      "source": { "source": "github", "repo": "chordcommerce/ask-chord" },
+      "autoUpdate": true
+    }
+  }
+}
+```
+
+**For an individual:** after installing, enable auto-update from the
+`/plugin` menu, or refresh on demand with
+`/plugin marketplace update chord` followed by `/reload-plugins`.
+
 ### Option A — One-liner (recommended)
 
 Installs the skill from this repo into `~/.claude/skills/ask-chord/`:
@@ -72,7 +135,7 @@ sign-in.
 
 If you'd rather not run a remote script, the steps are:
 
-1. Copy [`plugin/skills/ask-chord/SKILL.md`](plugin/skills/ask-chord/SKILL.md)
+1. Copy [`plugins/chord/skills/ask-chord/SKILL.md`](plugins/chord/skills/ask-chord/SKILL.md)
    into `~/.claude/skills/ask-chord/SKILL.md` (create the directory
    if needed).
 2. Register the MCP server with the `claude mcp add` command shown above.
@@ -180,7 +243,7 @@ If the server doesn't appear, check the MCP log:
 Claude Desktop doesn't auto-load `~/.claude/skills/` the way Claude
 Code does, but it has its own skill upload UI:
 
-1. Download [`plugin/skills/ask-chord/SKILL.md`](plugin/skills/ask-chord/SKILL.md)
+1. Download [`plugins/chord/skills/ask-chord/SKILL.md`](plugins/chord/skills/ask-chord/SKILL.md)
    from this repo.
 2. In Claude Desktop, open **Customize → Skill**, click the **+** icon,
    and choose **Upload**.
