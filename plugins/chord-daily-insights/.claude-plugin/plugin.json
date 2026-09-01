@@ -4,5 +4,5 @@
   "description": "Nightly commerce-signals digest (revenue, ROAS, repeat/LTV, LTV/CAC, VIP slippage) posted to Slack.",
   "author": { "name": "Chord Commerce" },
   "homepage": "https://github.com/chordcommerce/ask-chord",
-  "dependencies": ["chord", "chord-metric-verify"]
+  "dependencies": ["ask-chord", "chord-metric-verify"]
 }

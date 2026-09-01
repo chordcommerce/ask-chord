@@ -4,9 +4,9 @@
   "description": "Chord Commerce's Claude Code plugin marketplace — connect Claude to your Chord warehouse and run analytics workflows.",
   "plugins": [
     {
-      "name": "chord",
-      "source": "./plugins/chord",
-      "displayName": "Chord",
+      "name": "ask-chord",
+      "source": "./plugins/ask-chord",
+      "displayName": "Ask Chord",
       "description": "Registers the Ask Chord MCP server and the data-question workflow skill.",
       "category": "data",
       "keywords": ["chord", "warehouse", "analytics", "sql", "mcp"]

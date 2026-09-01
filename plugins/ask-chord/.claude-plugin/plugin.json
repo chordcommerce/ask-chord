@@ -1,5 +1,5 @@
 {
-  "name": "chord",
+  "name": "ask-chord",
   "version": "0.2.0",
   "description": "Ask Chord MCP server registration and the data-question workflow skill.",
   "author": { "name": "Chord Commerce" },

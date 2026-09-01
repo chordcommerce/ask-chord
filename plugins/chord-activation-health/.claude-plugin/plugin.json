@@ -4,5 +4,5 @@
   "description": "Report the health of all audience syncs and destinations against your Chord warehouse.",
   "author": { "name": "Chord Commerce" },
   "homepage": "https://github.com/chordcommerce/ask-chord",
-  "dependencies": ["chord"]
+  "dependencies": ["ask-chord"]
 }

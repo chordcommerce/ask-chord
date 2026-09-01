@@ -4,5 +4,5 @@
   "description": "Verify a revenue, order-count, or LTV figure uses the correct basis before it ships.",
   "author": { "name": "Chord Commerce" },
   "homepage": "https://github.com/chordcommerce/ask-chord",
-  "dependencies": ["chord"]
+  "dependencies": ["ask-chord"]
 }

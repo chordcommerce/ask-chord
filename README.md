@@ -17,15 +17,18 @@ infrastructure.
 > `ask-chord` (`claude mcp remove chord-copilot`, then the
 > `claude mcp add` command below).
 
-> **Upgrading from the bundled `chord` plugin?** `chord` is now lean —
-> it registers the MCP server and the core `ask-chord` skill only. The
-> activation-health, metric-verify, and daily-insights skills are now
-> separate plugins. Install any you use:
+> **Upgrading from the bundled `chord` plugin?** The base plugin was
+> renamed from `chord` to `ask-chord` (reinstall with
+> `/plugin install ask-chord@chord`) and is now lean — it registers the
+> MCP server and the core `ask-chord` skill only. The activation-health,
+> metric-verify, and daily-insights skills are now separate plugins.
+> Install any you use:
 > `/plugin install chord-activation-health@chord`,
 > `/plugin install chord-metric-verify@chord`,
 > `/plugin install chord-daily-insights@chord`. If you rely on the
-> nightly digest, install `chord-daily-insights` (it pulls `chord` and
-> `chord-metric-verify` automatically) and keep your Slack MCP connected.
+> nightly digest, install `chord-daily-insights` (it pulls `ask-chord`
+> and `chord-metric-verify` automatically) and keep your Slack MCP
+> connected.
 
 ## Before you start
 
@@ -47,7 +50,7 @@ sessions.
 
 ## Claude Code
 
-> **Tip:** the one-step path is `/plugin install chord@chord`. Because
+> **Tip:** the one-step path is `/plugin install ask-chord@chord`. Because
 > Ask Chord now lives at a single shared endpoint
 > (`https://mcp.chord.co/mcp`), the plugin registers the MCP server and
 > installs the skill together — no per-customer URL to fill in. The two
@@ -68,10 +71,10 @@ then install the plugins you want:
 /plugin marketplace add chordcommerce/ask-chord
 
 # Base plugin: registers the Ask Chord MCP server + the data-question skill
-/plugin install chord@chord
+/plugin install ask-chord@chord
 ```
 
-Optional add-on plugins (each pulls in `chord` automatically):
+Optional add-on plugins (each pulls in `ask-chord` automatically):
 
 | Plugin | What it adds |
 |---|---|
@@ -80,7 +83,7 @@ Optional add-on plugins (each pulls in `chord` automatically):
 | `chord-daily-insights@chord` | Nightly commerce-signals digest to Slack (also pulls `chord-metric-verify`) |
 
 ```bash
-/plugin install chord-daily-insights@chord   # installs chord + chord-metric-verify too
+/plugin install chord-daily-insights@chord   # installs ask-chord + chord-metric-verify too
 ```
 
 `chord-daily-insights` also needs a Slack MCP server connected in your
@@ -135,7 +138,7 @@ sign-in.
 
 If you'd rather not run a remote script, the steps are:
 
-1. Copy [`plugins/chord/skills/ask-chord/SKILL.md`](plugins/chord/skills/ask-chord/SKILL.md)
+1. Copy [`plugins/ask-chord/skills/ask-chord/SKILL.md`](plugins/ask-chord/skills/ask-chord/SKILL.md)
    into `~/.claude/skills/ask-chord/SKILL.md` (create the directory
    if needed).
 2. Register the MCP server with the `claude mcp add` command shown above.
@@ -159,7 +162,7 @@ claude mcp list   # ask-chord should show as connected
 ```
 
 Then ask Claude *"How many orders did we have last month?"* — the
-`chord:ask-chord` skill should auto-trigger and walk through
+`ask-chord:ask-chord` skill should auto-trigger and walk through
 `search_schema` → `search_saved_views` / `search_sql_pairs` →
 `search_instructions` → draft SQL → `execute_sql`.
 
@@ -243,7 +246,7 @@ If the server doesn't appear, check the MCP log:
 Claude Desktop doesn't auto-load `~/.claude/skills/` the way Claude
 Code does, but it has its own skill upload UI:
 
-1. Download [`plugins/chord/skills/ask-chord/SKILL.md`](plugins/chord/skills/ask-chord/SKILL.md)
+1. Download [`plugins/ask-chord/skills/ask-chord/SKILL.md`](plugins/ask-chord/skills/ask-chord/SKILL.md)
    from this repo.
 2. In Claude Desktop, open **Customize → Skill**, click the **+** icon,
    and choose **Upload**.
