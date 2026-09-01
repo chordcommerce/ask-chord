@@ -10,7 +10,7 @@
         "url": "https://github.com/chordcommerce/chord-copilot.git",
         "path": "plugin"
       },
-      "description": "Registers the chord-copilot MCP server and installs the data-question workflow skill."
+      "description": "Registers the Ask Chord MCP server (chord-copilot) and installs the data-question workflow skill."
     }
   ]
 }

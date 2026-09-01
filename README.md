@@ -1,16 +1,19 @@
-# Chord Copilot
+# Ask Chord
 
-Chord Copilot is a hosted MCP server that lets Claude answer data
-questions against **your** Chord warehouse — schema lookup, saved views,
-canonical SQL pairs, and `execute_sql`, all behind OAuth.
+Ask Chord (formerly Chord Copilot) is a hosted MCP server that lets
+Claude answer data questions against **your** Chord warehouse — schema
+lookup, saved views, canonical SQL pairs, and `execute_sql`, all behind
+OAuth.
 
 This repo contains the **install artifacts** for connecting Claude (Code
-or Desktop) to Chord Copilot. The server itself runs on Chord-managed
-infrastructure.
+or Desktop) to Ask Chord. The server itself runs on Chord-managed
+infrastructure. (Machine identifiers — the `chord-copilot` server name,
+skill directory, and repo URL — keep the legacy name so existing
+installs don't break.)
 
 ## Before you start
 
-Chord Copilot is reachable at a single global endpoint:
+Ask Chord is reachable at a single global endpoint:
 
 ```
 https://mcp.chord.co/mcp
@@ -29,14 +32,14 @@ sessions.
 ## Claude Code
 
 > **Tip:** the one-step path is `/plugin install chord@chord`. Because
-> Copilot now lives at a single shared endpoint
+> Ask Chord now lives at a single shared endpoint
 > (`https://mcp.chord.co/mcp`), the plugin registers the MCP server and
 > installs the skill together — no per-customer URL to fill in. The two
 > options below set the same thing up manually; use them if you'd rather
 > not use the plugin.
 
 You need to do two things: **register the MCP server** so Claude Code
-can talk to Copilot, and **install the skill** so Claude knows the
+can talk to Ask Chord, and **install the skill** so Claude knows the
 retrieval-grounded workflow for using it.
 
 ### Option A — One-liner (recommended)
@@ -107,7 +110,7 @@ to manage.
 
 1. Open **Settings → Connectors → Add custom connector**.
 2. Fill in:
-   - **Name:** `Chord Copilot`
+   - **Name:** `Ask Chord`
    - **Remote MCP server URL:** `https://mcp.chord.co/mcp`
 3. Save. Claude Desktop opens a browser tab for OAuth sign-in on first use.
 

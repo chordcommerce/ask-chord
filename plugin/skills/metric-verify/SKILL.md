@@ -47,7 +47,7 @@ A query for "last month's revenue" uses UTC date boundaries. Shopify admin's
 hours at each boundary — roughly a day of orders at each end of the month
 that fall in different calendar months depending on which surface you're using.
 
-**When to surface this:** Any time the user mentions comparing a Copilot or
+**When to surface this:** Any time the user mentions comparing an Ask Chord or
 SQL result to a Shopify admin figure, or says "the numbers don't match."
 
 Fix to offer:
