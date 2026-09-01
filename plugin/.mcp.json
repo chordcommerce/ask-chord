@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "chord-copilot": {
+    "ask-chord": {
       "type": "streamable-http",
       "url": "https://mcp.chord.co/mcp"
     }

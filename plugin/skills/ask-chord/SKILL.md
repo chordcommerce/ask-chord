@@ -1,12 +1,12 @@
 ---
-name: chord-copilot
-description: "Answer data questions against the Chord warehouse using the chord MCP retrieval and execution tools. Use when the user asks about warehouse data, schema, metrics, revenue, customers, orders, products, subscriptions, sessions, attribution, Shopify, Klaviyo, Iterable, or any saved/canonical query — i.e. anything that would be answered by SQL against the Chord data model. Triggers include 'how many', 'show me', 'top N', 'last month', 'last quarter', 'trend', 'breakdown', 'compare', 'revenue', 'orders', 'customers'. Walks the agent through the default retrieval-grounded SQL workflow: search_schema → search_saved_views / search_sql_pairs → search_instructions → draft SQL → execute_sql. Requires the chord-copilot MCP server to be connected; if the mcp__chord__* tools are not available, fall back to the user's normal workflow and tell them to connect the server."
+name: ask-chord
+description: "Answer data questions against the Chord warehouse using the chord MCP retrieval and execution tools. Use when the user asks about warehouse data, schema, metrics, revenue, customers, orders, products, subscriptions, sessions, attribution, Shopify, Klaviyo, Iterable, or any saved/canonical query — i.e. anything that would be answered by SQL against the Chord data model. Triggers include 'how many', 'show me', 'top N', 'last month', 'last quarter', 'trend', 'breakdown', 'compare', 'revenue', 'orders', 'customers'. Walks the agent through the default retrieval-grounded SQL workflow: search_schema → search_saved_views / search_sql_pairs → search_instructions → draft SQL → execute_sql. Requires the Ask Chord MCP server (registered as ask-chord) to be connected; if the mcp__chord__* tools are not available, fall back to the user's normal workflow and tell them to connect the server."
 ---
 
-# Chord Copilot — data-question workflow
+# Ask Chord — data-question workflow
 
-You have access to a set of `mcp__chord__*` tools exposed by the chord-copilot
-MCP server. Reach for them automatically — without being asked — whenever the
+You have access to a set of `mcp__chord__*` tools exposed by the Ask Chord
+MCP server (registered as `ask-chord`). Reach for them automatically — without being asked — whenever the
 user's request involves the project's warehouse data, schema, saved queries,
 or product documentation. Do not fall back to hand-written SQL or guess at
 table names when these tools are available.
@@ -22,8 +22,8 @@ table names when these tools are available.
 - **`search_instructions`** — pull any always-apply SQL guidance the user
   has stored (filters, joins, casing rules, revenue/COGS conventions,
   test-order exclusion). Run this before finalizing SQL.
-- **`search_documentation`** — for "how do I…" questions about the Chord
-  Copilot product itself (global, not project-scoped).
+- **`search_documentation`** — for "how do I…" questions about the Ask
+  Chord product itself (global, not project-scoped).
 - **`preview_table`** — peek at a handful of rows from a known table.
   Capped at 100 rows; use for shape/sanity checks, not analysis.
 - **`execute_sql`** — run a read-only query (SELECT/UNION/INTERSECT/EXCEPT
@@ -69,6 +69,6 @@ Run independent retrieval steps in parallel.
   the user asked for 'revenue', not 'net revenue' — instruction #37
   reserves the COGS+shipping formula for explicit 'net revenue' asks.")
 - If a saved view answered the question, name the `view_id` so the user
-  can find it in Copilot.
+  can find it in Ask Chord.
 - If the engine returns an error, surface the error text verbatim before
   attempting a fix — the user often recognizes it.
