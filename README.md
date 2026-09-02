@@ -5,17 +5,18 @@ Claude answer data questions against **your** Chord warehouse — schema
 lookup, saved views, canonical SQL pairs, and `execute_sql`, all behind
 OAuth.
 
-This repo contains the **install artifacts** for connecting Claude (Code
-or Desktop) to Ask Chord. The server itself runs on Chord-managed
+This repo is the **Chord plugin marketplace** for connecting Claude
+(Code or Desktop) to Ask Chord. The server itself runs on Chord-managed
 infrastructure.
 
 > **Migrating from `chord-copilot`?** This repo was renamed from
 > `chordcommerce/chord-copilot` — GitHub redirects the old git and raw
-> URLs, so existing installs keep working. Re-running `install.sh`
-> installs the skill under its new `ask-chord` name and removes the
-> legacy copy; for Claude Code, also re-register the server as
-> `ask-chord` (`claude mcp remove chord-copilot`, then the
-> `claude mcp add` command below).
+> URLs, so existing installs keep working. To move to the new name,
+> reinstall from the marketplace (`/plugin install ask-chord@chord`,
+> steps below). In Claude Code, if you registered the server manually
+> under the old name, also re-register it as `ask-chord`
+> (`claude mcp remove chord-copilot`, then the `claude mcp add` command
+> below).
 
 > **Upgrading from the bundled `chord` plugin?** The base plugin was
 > renamed from `chord` to `ask-chord` (reinstall with
@@ -50,21 +51,21 @@ sessions.
 
 ## Claude Code
 
-> **Tip:** the one-step path is `/plugin install ask-chord@chord`. Because
-> Ask Chord now lives at a single shared endpoint
-> (`https://mcp.chord.co/mcp`), the plugin registers the MCP server and
-> installs the skill together — no per-customer URL to fill in. The two
-> options below set the same thing up manually; use them if you'd rather
-> not use the plugin.
+The recommended path is the **Chord marketplace**: add it once, then
+install the plugins you want. Each plugin registers the Ask Chord MCP
+server and installs the matching skill together — no per-customer URL to
+fill in.
 
-You need to do two things: **register the MCP server** so Claude Code
-can talk to Ask Chord, and **install the skill** so Claude knows the
-retrieval-grounded workflow for using it.
+### What is a marketplace?
 
-### Install via the Chord marketplace (recommended)
+A plugin marketplace is just a Git repo (this one) with a manifest that
+lists installable plugins. Adding a marketplace tells Claude Code where
+to find Chord's plugins; installing a plugin from it registers the MCP
+server and skill in one step. Marketplaces are a **Claude Code** feature
+— Claude Desktop can't add them (see the Claude Desktop section for its
+setup).
 
-Chord's plugins live in a public Claude Code marketplace. Add it once,
-then install the plugins you want:
+### Install via the Chord marketplace
 
 ```bash
 # Add the marketplace (one time)
@@ -73,6 +74,11 @@ then install the plugins you want:
 # Base plugin: registers the Ask Chord MCP server + the data-question skill
 /plugin install ask-chord@chord
 ```
+
+`/plugin marketplace add` takes a GitHub `owner/repo` (as above), a full
+Git URL, or a local path. Manage marketplaces with
+`/plugin marketplace list`, `/plugin marketplace update chord`, and
+`/plugin marketplace remove chord`.
 
 Optional add-on plugins (each pulls in `ask-chord` automatically):
 
@@ -114,46 +120,35 @@ background refresh + plugin auto-update for everyone who trusts the repo:
 `/plugin` menu, or refresh on demand with
 `/plugin marketplace update chord` followed by `/reload-plugins`.
 
-### Option A — One-liner (recommended)
+### Manual setup (without the marketplace)
 
-Installs the skill from this repo into `~/.claude/skills/ask-chord/`:
+If you'd rather not use plugins, set the two pieces up by hand.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/chordcommerce/ask-chord/main/install.sh | bash
-```
+1. **Register the MCP server** so Claude Code can talk to Ask Chord:
 
-Then register the MCP server:
+   ```bash
+   claude mcp add ask-chord \
+     --transport http \
+     --scope user \
+     https://mcp.chord.co/mcp
+   ```
 
-```bash
-claude mcp add ask-chord \
-  --transport http \
-  --scope user \
-  https://mcp.chord.co/mcp
-```
+2. **Install the skill** so Claude knows the retrieval-grounded workflow
+   for using it: copy
+   [`plugins/ask-chord/skills/ask-chord/SKILL.md`](plugins/ask-chord/skills/ask-chord/SKILL.md)
+   into `~/.claude/skills/ask-chord/SKILL.md` (create the directory if
+   needed).
 
 Restart Claude Code. On first use, a browser tab opens for OAuth
 sign-in.
 
-### Option B — Manual
-
-If you'd rather not run a remote script, the steps are:
-
-1. Copy [`plugins/ask-chord/skills/ask-chord/SKILL.md`](plugins/ask-chord/skills/ask-chord/SKILL.md)
-   into `~/.claude/skills/ask-chord/SKILL.md` (create the directory
-   if needed).
-2. Register the MCP server with the `claude mcp add` command shown above.
-
 ### Scope: user vs. project
 
-The examples above use `--scope user`, which makes the server available
-in every Claude Code session. To scope it to a single repo instead, run
-the `claude mcp add` command from inside that repo with
+The `claude mcp add` example above uses `--scope user`, which makes the
+server available in every Claude Code session. To scope it to a single
+repo instead, run the command from inside that repo with
 `--scope project` — it writes to `.claude/settings.json` in the project
 root, which you can commit so teammates pick it up automatically.
-
-The `install.sh` script supports the same split:
-`--scope project --project-dir <path>` drops the skill under
-`<path>/.claude/skills/ask-chord/`.
 
 ### Verifying
 
@@ -170,9 +165,13 @@ Then ask Claude *"How many orders did we have last month?"* — the
 
 ## Claude Desktop
 
-Claude Desktop has two ways to add a remote MCP server. The connector
-UI is faster but only available on paid plans; the config-file path
-works on any plan but needs a stdio bridge.
+Claude Desktop doesn't support plugin marketplaces, so there's no
+one-step install — you connect the MCP server and upload the skill
+separately.
+
+There are two ways to add the server. The connector UI is faster but
+only available on paid plans; the config-file path works on any plan but
+needs a stdio bridge.
 
 ### Option A — Custom connector (Pro / Team / Enterprise)
 
@@ -194,18 +193,7 @@ npm package. (Adding a bare `url` field to the JSON config triggers a
 known bug where Claude Desktop silently drops the entire `mcpServers`
 block on next launch — don't.)
 
-**Automated (macOS/Linux, requires `jq`):**
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/chordcommerce/ask-chord/main/install.sh | \
-  bash -s -- --client claude-desktop --url https://mcp.chord.co/mcp
-```
-
-This merges a `ask-chord` entry into `claude_desktop_config.json`
-without touching other MCP servers you may have configured. Pass
-`--force` to overwrite a differing existing entry.
-
-**Manual:** open **Settings → Developer → Edit Config** (or directly:
+Open **Settings → Developer → Edit Config** (or directly:
 `~/Library/Application Support/Claude/claude_desktop_config.json` on
 macOS, `%APPDATA%\Claude\claude_desktop_config.json` on Windows) and
 add:
@@ -263,22 +251,6 @@ Any client that supports remote `streamable-http` MCP servers can
 connect directly to `https://mcp.chord.co/mcp`.
 Clients that only speak stdio (like Claude Desktop's config file) need
 the `mcp-remote` shim shown above.
-
-## `install.sh` reference
-
-```
-./install.sh [--client claude-code|claude-desktop] \
-             [--scope user|project] [--project-dir <path>] \
-             [--url <url>] [--force]
-```
-
-- `--client claude-code` (default) — drops `SKILL.md` under `~/.claude/skills/`.
-- `--client claude-desktop` — merges MCP entry into `claude_desktop_config.json`. Requires `jq`. macOS/Linux only.
-- `--scope user` (default) → `~/.claude/skills/ask-chord/`.
-- `--scope project` → `<project-dir>/.claude/skills/ask-chord/`.
-- `--project-dir <path>` — defaults to `pwd`.
-- `--url <url>` — MCP server URL (claude-desktop only; defaults to `https://mcp.chord.co/mcp`).
-- `--force` — overwrite an existing install/entry without prompting.
 
 ## Troubleshooting
 
