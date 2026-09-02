@@ -59,11 +59,11 @@ fill in.
 ### What is a marketplace?
 
 A plugin marketplace is just a Git repo (this one) with a manifest that
-lists installable plugins. Adding a marketplace tells Claude Code where
-to find Chord's plugins; installing a plugin from it registers the MCP
-server and skill in one step. Marketplaces are a **Claude Code** feature
-— Claude Desktop can't add them (see the Claude Desktop section for its
-setup).
+lists installable plugins. Adding a marketplace tells Claude where to
+find Chord's plugins; installing a plugin from it registers the MCP
+server and loads the skill in one step. Both Claude Code and Claude
+Desktop support marketplaces — the steps below are for Claude Code; see
+the Claude Desktop section for that app's menus.
 
 ### Install via the Chord marketplace
 
@@ -165,15 +165,33 @@ Then ask Claude *"How many orders did we have last month?"* — the
 
 ## Claude Desktop
 
-Claude Desktop doesn't support plugin marketplaces, so there's no
-one-step install — you connect the MCP server and upload the skill
-separately.
+Claude Desktop supports the same marketplace flow, so installing a
+plugin is the recommended path here too — it registers the Ask Chord
+MCP server and loads the skill together, no per-customer URL to fill in.
 
-There are two ways to add the server. The connector UI is faster but
-only available on paid plans; the config-file path works on any plan but
-needs a stdio bridge.
+### Install via the Chord marketplace (recommended)
 
-### Option A — Custom connector (Pro / Team / Enterprise)
+1. Open **Settings → Plugins**.
+2. Click **Add** and choose **Marketplace**.
+3. Enter the marketplace as a GitHub repo — `chordcommerce/ask-chord` —
+   or its Git URL (`https://github.com/chordcommerce/ask-chord`).
+4. Install the **`ask-chord`** plugin. Add any of the optional plugins
+   from the table above the same way (`chord-metric-verify`,
+   `chord-activation-health`, `chord-daily-insights`) — each pulls in
+   `ask-chord` automatically.
+
+On first use, Claude Desktop opens a browser tab for OAuth sign-in with
+your Chord account. The `ask-chord` skill then auto-triggers on data
+questions, exactly as it does in Claude Code.
+
+### Manual setup (without the marketplace)
+
+If you'd rather not use plugins, add the server and skill by hand. There
+are two ways to add the server — the connector UI is faster but only on
+paid plans; the config-file path works on any plan but needs a stdio
+bridge.
+
+#### Option A — Custom connector (Pro / Team / Enterprise)
 
 Available on paid Claude plans only. The UI talks the
 `streamable-http` protocol natively, so there's no shim or config file
@@ -185,7 +203,7 @@ to manage.
    - **Remote MCP server URL:** `https://mcp.chord.co/mcp`
 3. Save. Claude Desktop opens a browser tab for OAuth sign-in on first use.
 
-### Option B — Edit config file (any plan)
+#### Option B — Edit config file (any plan)
 
 Claude Desktop's config file only speaks stdio, so the remote endpoint
 has to be bridged through the [`mcp-remote`](https://www.npmjs.com/package/mcp-remote)
@@ -219,20 +237,17 @@ If you already have other servers under `mcpServers`, merge the
 On first launch, `mcp-remote` opens a browser tab for OAuth sign-in and
 caches the token under `~/.mcp-auth/` for future sessions.
 
-### Restart
-
-Full quit and reopen — closing the window is not enough. Use `Cmd+Q`
-on macOS, or exit from the system tray on Windows.
-
-If the server doesn't appear, check the MCP log:
+After editing the config, full quit and reopen — closing the window is
+not enough. Use `Cmd+Q` on macOS, or exit from the system tray on
+Windows. If the server doesn't appear, check the MCP log:
 
 - **macOS:** `~/Library/Logs/Claude/mcp.log`
 - **Windows:** `%APPDATA%\Claude\logs\mcp.log`
 
-### Skill in Claude Desktop
+#### Upload the skill
 
-Claude Desktop doesn't auto-load `~/.claude/skills/` the way Claude
-Code does, but it has its own skill upload UI:
+The manual paths above add only the server. To load the skill without a
+plugin, use Claude Desktop's skill upload UI:
 
 1. Download [`plugins/ask-chord/skills/ask-chord/SKILL.md`](plugins/ask-chord/skills/ask-chord/SKILL.md)
    from this repo.
