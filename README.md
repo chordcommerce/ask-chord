@@ -49,21 +49,118 @@ sessions.
 
 ---
 
-## Claude Code
+## Claude Desktop
 
-The recommended path is the **Chord marketplace**: add it once, then
-install the plugins you want. Each plugin registers the Ask Chord MCP
-server and installs the matching skill together — no per-customer URL to
-fill in.
+Claude Desktop supports the same marketplace flow, so installing a
+plugin is the recommended path here too — it registers the Ask Chord
+MCP server and loads the skill together, no per-customer URL to fill in.
 
 ### What is a marketplace?
 
 A plugin marketplace is just a Git repo (this one) with a manifest that
 lists installable plugins. Adding a marketplace tells Claude where to
 find Chord's plugins; installing a plugin from it registers the MCP
-server and loads the skill in one step. Both Claude Code and Claude
-Desktop support marketplaces — the steps below are for Claude Code; see
-the Claude Desktop section for that app's menus.
+server and loads the skill in one step. Both Claude Desktop and Claude
+Code support marketplaces — each app's menus are covered in its own
+section below.
+
+### Install via the Chord marketplace (recommended)
+
+1. Open **Settings → Plugins**.
+2. Click **Add** and choose **Marketplace**.
+3. Enter the marketplace as a GitHub repo — `chordcommerce/ask-chord` —
+   or its Git URL (`https://github.com/chordcommerce/ask-chord`).
+4. Install the **`ask-chord`** plugin. Add any of the optional plugins
+   the same way (`chord-metric-verify`, `chord-activation-health`,
+   `chord-daily-insights`) — each pulls in `ask-chord` automatically.
+   See the add-on table in the Claude Code section for what each adds.
+
+On first use, Claude Desktop opens a browser tab for OAuth sign-in with
+your Chord account. The `ask-chord` skill then auto-triggers on data
+questions, exactly as it does in Claude Code.
+
+### Manual setup (without the marketplace)
+
+If you'd rather not use plugins, add the server and skill by hand. There
+are two ways to add the server — the connector UI is faster but only on
+paid plans; the config-file path works on any plan but needs a stdio
+bridge.
+
+#### Option A — Custom connector (Pro / Team / Enterprise)
+
+Available on paid Claude plans only. The UI talks the
+`streamable-http` protocol natively, so there's no shim or config file
+to manage.
+
+1. Open **Settings → Connectors → Add custom connector**.
+2. Fill in:
+   - **Name:** `Ask Chord`
+   - **Remote MCP server URL:** `https://mcp.chord.co/mcp`
+3. Save. Claude Desktop opens a browser tab for OAuth sign-in on first use.
+
+#### Option B — Edit config file (any plan)
+
+Claude Desktop's config file only speaks stdio, so the remote endpoint
+has to be bridged through the [`mcp-remote`](https://www.npmjs.com/package/mcp-remote)
+npm package. (Adding a bare `url` field to the JSON config triggers a
+known bug where Claude Desktop silently drops the entire `mcpServers`
+block on next launch — don't.)
+
+Open **Settings → Developer → Edit Config** (or directly:
+`~/Library/Application Support/Claude/claude_desktop_config.json` on
+macOS, `%APPDATA%\Claude\claude_desktop_config.json` on Windows) and
+add:
+
+```json
+{
+  "mcpServers": {
+    "ask-chord": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://mcp.chord.co/mcp"
+      ]
+    }
+  }
+}
+```
+
+If you already have other servers under `mcpServers`, merge the
+`ask-chord` entry into the existing block — don't replace it.
+
+On first launch, `mcp-remote` opens a browser tab for OAuth sign-in and
+caches the token under `~/.mcp-auth/` for future sessions.
+
+After editing the config, full quit and reopen — closing the window is
+not enough. Use `Cmd+Q` on macOS, or exit from the system tray on
+Windows. If the server doesn't appear, check the MCP log:
+
+- **macOS:** `~/Library/Logs/Claude/mcp.log`
+- **Windows:** `%APPDATA%\Claude\logs\mcp.log`
+
+#### Upload the skill
+
+The manual paths above add only the server. To load the skill without a
+plugin, use Claude Desktop's skill upload UI:
+
+1. Download [`plugins/ask-chord/skills/ask-chord/SKILL.md`](plugins/ask-chord/skills/ask-chord/SKILL.md)
+   from this repo.
+2. In Claude Desktop, open **Customize → Skill**, click the **+** icon,
+   and choose **Upload**.
+3. Select the `SKILL.md` you just downloaded.
+
+The skill will then auto-trigger on data questions, the same way it
+does in Claude Code.
+
+---
+
+## Claude Code
+
+The recommended path is the **Chord marketplace**: add it once, then
+install the plugins you want. Each plugin registers the Ask Chord MCP
+server and installs the matching skill together — no per-customer URL to
+fill in.
 
 ### Install via the Chord marketplace
 
@@ -160,103 +257,6 @@ Then ask Claude *"How many orders did we have last month?"* — the
 `ask-chord:ask-chord` skill should auto-trigger and walk through
 `search_schema` → `search_saved_views` / `search_sql_pairs` →
 `search_instructions` → draft SQL → `execute_sql`.
-
----
-
-## Claude Desktop
-
-Claude Desktop supports the same marketplace flow, so installing a
-plugin is the recommended path here too — it registers the Ask Chord
-MCP server and loads the skill together, no per-customer URL to fill in.
-
-### Install via the Chord marketplace (recommended)
-
-1. Open **Settings → Plugins**.
-2. Click **Add** and choose **Marketplace**.
-3. Enter the marketplace as a GitHub repo — `chordcommerce/ask-chord` —
-   or its Git URL (`https://github.com/chordcommerce/ask-chord`).
-4. Install the **`ask-chord`** plugin. Add any of the optional plugins
-   from the table above the same way (`chord-metric-verify`,
-   `chord-activation-health`, `chord-daily-insights`) — each pulls in
-   `ask-chord` automatically.
-
-On first use, Claude Desktop opens a browser tab for OAuth sign-in with
-your Chord account. The `ask-chord` skill then auto-triggers on data
-questions, exactly as it does in Claude Code.
-
-### Manual setup (without the marketplace)
-
-If you'd rather not use plugins, add the server and skill by hand. There
-are two ways to add the server — the connector UI is faster but only on
-paid plans; the config-file path works on any plan but needs a stdio
-bridge.
-
-#### Option A — Custom connector (Pro / Team / Enterprise)
-
-Available on paid Claude plans only. The UI talks the
-`streamable-http` protocol natively, so there's no shim or config file
-to manage.
-
-1. Open **Settings → Connectors → Add custom connector**.
-2. Fill in:
-   - **Name:** `Ask Chord`
-   - **Remote MCP server URL:** `https://mcp.chord.co/mcp`
-3. Save. Claude Desktop opens a browser tab for OAuth sign-in on first use.
-
-#### Option B — Edit config file (any plan)
-
-Claude Desktop's config file only speaks stdio, so the remote endpoint
-has to be bridged through the [`mcp-remote`](https://www.npmjs.com/package/mcp-remote)
-npm package. (Adding a bare `url` field to the JSON config triggers a
-known bug where Claude Desktop silently drops the entire `mcpServers`
-block on next launch — don't.)
-
-Open **Settings → Developer → Edit Config** (or directly:
-`~/Library/Application Support/Claude/claude_desktop_config.json` on
-macOS, `%APPDATA%\Claude\claude_desktop_config.json` on Windows) and
-add:
-
-```json
-{
-  "mcpServers": {
-    "ask-chord": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote",
-        "https://mcp.chord.co/mcp"
-      ]
-    }
-  }
-}
-```
-
-If you already have other servers under `mcpServers`, merge the
-`ask-chord` entry into the existing block — don't replace it.
-
-On first launch, `mcp-remote` opens a browser tab for OAuth sign-in and
-caches the token under `~/.mcp-auth/` for future sessions.
-
-After editing the config, full quit and reopen — closing the window is
-not enough. Use `Cmd+Q` on macOS, or exit from the system tray on
-Windows. If the server doesn't appear, check the MCP log:
-
-- **macOS:** `~/Library/Logs/Claude/mcp.log`
-- **Windows:** `%APPDATA%\Claude\logs\mcp.log`
-
-#### Upload the skill
-
-The manual paths above add only the server. To load the skill without a
-plugin, use Claude Desktop's skill upload UI:
-
-1. Download [`plugins/ask-chord/skills/ask-chord/SKILL.md`](plugins/ask-chord/skills/ask-chord/SKILL.md)
-   from this repo.
-2. In Claude Desktop, open **Customize → Skill**, click the **+** icon,
-   and choose **Upload**.
-3. Select the `SKILL.md` you just downloaded.
-
-The skill will then auto-trigger on data questions, the same way it
-does in Claude Code.
 
 ---
 
