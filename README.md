@@ -236,6 +236,17 @@ If you'd rather not use plugins, set the two pieces up by hand.
    into `~/.claude/skills/ask-chord/SKILL.md` (create the directory if
    needed).
 
+> **The skill is recommended, but the server works without it.** Ask
+> Chord ships the same retrieval-grounded workflow in the MCP server's
+> own instructions (loaded whenever the server is connected), and each
+> tool carries its own usage description — so even server-only, Claude
+> runs the `search_instructions` → `search_sql_pairs` → `search_schema`
+> → draft → validate → submit loop. Installing the skill mainly sharpens
+> two things: **triggering** — Claude reaches for the workflow
+> automatically on data questions ("how many orders last month?") rather
+> than needing a nudge — and **answer quality** — the fuller result-
+> presentation, finalizing, and timeout-recovery conventions.
+
 Restart Claude Code. On first use, a browser tab opens for OAuth
 sign-in.
 
